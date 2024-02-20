@@ -60,7 +60,7 @@ pts = [
 
 hook = cq.Workplane("XY").\
     workplane(offset = (plate_width - hook_width) / 2).\
-    center(plate_height, m1).\
+    center(0, m1).\
     polyline(pts).close().extrude(hook_width).\
     edges("|Z").fillet(1)
 
