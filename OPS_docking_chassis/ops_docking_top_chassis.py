@@ -33,16 +33,8 @@ pts = [
     (0, plate_length)
 ]
 
-holes = (
-    ((30, 189), 3),
-    ((110, 189), 3),
-)
-
 # format: ((x, y), height, post dia, hole dia, hole depth) 
 posts = (
-    ((15, 71), 7, 7, 2.6, 7),
-    ((125, 71), 7, 7, 2.6, 7),
-    ((70, 22), 7, 7, 2.6, 7),
     ((5, 13), 30, 8, 2.9, 7),
     ((5, 72.5), 30, 8, 2.9, 7),
     ((135, 72.5), 30, 8, 2.9, 7),
@@ -57,11 +49,6 @@ base_plate = (
     .faces(">Z")
     .workplane()
 )
-
-for each_hole in holes:
-    pos = each_hole[0]
-    dia = each_hole[1]
-    base_plate = base_plate.moveTo(pos[0], pos[1]).hole(dia)
 
 for each_post in posts:
     pos = each_post[0]
