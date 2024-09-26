@@ -19,7 +19,7 @@ def intersect(wp1, wp2):
     return copy(wp1).union(wp2).cut(negative)
 
 
-stl_file = "ops_chassis_bottom.stl"
+stl_file = "ops_chassis_top.stl"
 plate_height = 3
 plate_width = 140
 plate_length = 90
@@ -53,8 +53,8 @@ base_plate = (
 for each_post in posts:
     pos = each_post[0]
     post_height = each_post[1]
-    post_dia = each_post[2]
-    base_plate = base_plate.moveTo(pos[0], pos[1]).circle(post_dia / 2).extrude(post_height)
+    hole_dia = each_post[3]
+    base_plate = base_plate.moveTo(pos[0], pos[1]).circle(hole_dia / 2).cutBlind(-10)
 
 base_plate = base_plate.faces(">Z").workplane()
 
@@ -63,6 +63,8 @@ for each_post in posts:
     post_hole_dia = each_post[3]
     post_hole_depth = each_post[4]
     base_plate = base_plate.moveTo(pos[0], pos[1]).hole(post_hole_dia)
+
+'''
 
 base_plate = base_plate.faces("<Z").workplane()
 
@@ -86,19 +88,18 @@ for each_post in posts:
         rect(2 * screw_head_radius, post_hole_dia, mode='s').finalize().extrude(-0.16)
     over_hang2[-1] = over_hang2[-1].moveTo(pos[0], pos[1]).sketch().circle(screw_head_radius).\
         rect(post_hole_dia, post_hole_dia, mode='s').finalize().extrude(-0.16)
-
+'''
 parts.append(base_plate)
 
 
 bracket = (
     cq.Workplane("XY").
-    polyline(((0, 80), (0, 77), (plate_width, 77), (plate_width, 80))).close().extrude(8 + plate_height).
-    faces("<Y").workplane().moveTo(31.5, plate_height + 5).hole(3.5).
-    moveTo(108.5, plate_height + 5).hole(3.5)
+    polyline(((0, 80), (0, 77), (plate_width, 77), (plate_width, 80))).close().extrude(5 + plate_height)
 )
 
 parts.append(bracket)
 
+'''
 wings = (
     cq.Workplane("XY").workplane(8 + plate_height).
     polyline(((0, 80), (0, 77), (37, 77), (37, 80))).close().
@@ -107,16 +108,19 @@ wings = (
 )
 
 parts.append(wings)
+'''
 
 result = cq.Workplane("XY")
 
 for each_part in parts:
     result = result.union(each_part)
 
+'''
 for each_oh in over_hang1:
     result = result.union(each_oh.translate((0, 0, screw_post_cut_len - 0.16))) 
 for each_oh in over_hang2:
     result = result.union(each_oh.translate((0, 0, screw_post_cut_len))) 
+'''
 
 
 # Let's cut a small piece and print it
