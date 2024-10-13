@@ -19,7 +19,7 @@ def intersect(wp1, wp2):
     return copy(wp1).union(wp2).cut(negative)
 
 
-stl_file = "ops_chassis_top.stl"
+stl_file = "ops_chassis_test.stl"
 plate_height = 3
 plate_width = 140
 plate_length = 90
@@ -33,12 +33,20 @@ pts = [
     (0, plate_length)
 ]
 
+holes = (
+    ((30, 189), 3),
+    ((110, 189), 3),
+)
+
 # format: ((x, y), height, post dia, hole dia, hole depth) 
 posts = (
-    ((5, 13), 30, 8, 3.5, 7),
-    ((5, 72.5), 30, 8, 3.5, 7),
-    ((135, 72.5), 30, 8, 3.5, 7),
-    ((135, 13), 30, 8, 3.5, 7)
+    ((15, 71), 7, 10, 6.3, 7),
+    ((125, 71), 7, 10, 6.3, 7),
+    ((70, 22), 7, 10, 6.3, 7),
+    ((5, 13), 30, 9, 5.3, 7),
+    ((5, 70), 30, 9, 5.3, 7),
+    ((135, 70), 30, 9, 5.3, 7),
+    ((135, 13), 30, 9, 5.3, 7)
 )
 
 base_plate = (
@@ -50,11 +58,16 @@ base_plate = (
     .workplane()
 )
 
+for each_hole in holes:
+    pos = each_hole[0]
+    dia = each_hole[1]
+    base_plate = base_plate.moveTo(pos[0], pos[1]).hole(dia)
+
 for each_post in posts:
     pos = each_post[0]
     post_height = each_post[1]
-    hole_dia = each_post[3]
-    base_plate = base_plate.moveTo(pos[0], pos[1]).circle(hole_dia / 2).cutBlind(-10)
+    post_dia = each_post[2]
+    base_plate = base_plate.moveTo(pos[0], pos[1]).circle(post_dia / 2).extrude(post_height)
 
 base_plate = base_plate.faces(">Z").workplane()
 
@@ -65,7 +78,6 @@ for each_post in posts:
     base_plate = base_plate.moveTo(pos[0], pos[1]).hole(post_hole_dia)
 
 '''
-
 base_plate = base_plate.faces("<Z").workplane()
 
 posts = posts[3:]
@@ -89,17 +101,19 @@ for each_post in posts:
     over_hang2[-1] = over_hang2[-1].moveTo(pos[0], pos[1]).sketch().circle(screw_head_radius).\
         rect(post_hole_dia, post_hole_dia, mode='s').finalize().extrude(-0.16)
 '''
+
 parts.append(base_plate)
 
 
 bracket = (
     cq.Workplane("XY").
-    polyline(((0, 80), (0, 77), (plate_width, 77), (plate_width, 80))).close().extrude(5 + plate_height)
+    polyline(((0, 80), (0, 77), (plate_width, 77), (plate_width, 80))).close().extrude(8 + plate_height).
+    faces("<Y").workplane().moveTo(31.5, plate_height + 5).hole(3.5).
+    moveTo(108.5, plate_height + 5).hole(3.5)
 )
 
 parts.append(bracket)
 
-'''
 wings = (
     cq.Workplane("XY").workplane(8 + plate_height).
     polyline(((0, 80), (0, 77), (37, 77), (37, 80))).close().
@@ -108,7 +122,6 @@ wings = (
 )
 
 parts.append(wings)
-'''
 
 result = cq.Workplane("XY")
 
@@ -125,8 +138,8 @@ for each_oh in over_hang2:
 
 # Let's cut a small piece and print it
 
-#box = cq.Workplane("XY").rect(50, 50).extrude(50)
+box = cq.Workplane("XY").rect(40, 15).extrude(50)
 
-#result = result.intersect(box)
+result = result.intersect(box.translate((0, 69.5, 0)))
 
 cq.exporters.export(result, stl_file)

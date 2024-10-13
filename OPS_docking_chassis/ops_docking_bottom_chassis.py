@@ -40,13 +40,13 @@ holes = (
 
 # format: ((x, y), height, post dia, hole dia, hole depth) 
 posts = (
-    ((15, 71), 7, 7, 2.6, 7),
-    ((125, 71), 7, 7, 2.6, 7),
-    ((70, 22), 7, 7, 2.6, 7),
-    ((5, 13), 30, 8, 2.9, 7),
-    ((5, 72.5), 30, 8, 2.9, 7),
-    ((135, 72.5), 30, 8, 2.9, 7),
-    ((135, 13), 30, 8, 2.9, 7)
+    ((15, 71), 7, 10, 5.9, 7),
+    ((125, 71), 7, 10, 5.9, 7),
+    ((70, 22), 7, 10, 5.9, 7),
+    ((5, 13), 30, 9, 4.9, 7),
+    ((5, 72.5), 30, 9, 4.9, 7),
+    ((135, 72.5), 30, 9, 4.9, 7),
+    ((135, 13), 30, 9, 4.9, 7)
 )
 
 base_plate = (
@@ -73,10 +73,21 @@ base_plate = base_plate.faces(">Z").workplane()
 
 for each_post in posts:
     pos = each_post[0]
+    post_height = each_post[1]
     post_hole_dia = each_post[3]
     post_hole_depth = each_post[4]
     base_plate = base_plate.moveTo(pos[0], pos[1]).hole(post_hole_dia)
 
+base_plate = base_plate.faces("<Z").workplane()
+
+for each_post in posts:
+    pos = each_post[0]
+    post_height = each_post[1]
+    post_hole_dia = each_post[3]
+    post_hole_depth = each_post[4]
+    base_plate = base_plate.moveTo(pos[0], -pos[1]).circle(post_dia / 2).extrude(-(post_height - 6.5))
+
+'''
 base_plate = base_plate.faces("<Z").workplane()
 
 posts = posts[3:]
@@ -100,6 +111,7 @@ for each_post in posts:
     over_hang2[-1] = over_hang2[-1].moveTo(pos[0], pos[1]).sketch().circle(screw_head_radius).\
         rect(post_hole_dia, post_hole_dia, mode='s').finalize().extrude(-0.16)
 
+'''
 parts.append(base_plate)
 
 
@@ -126,11 +138,12 @@ result = cq.Workplane("XY")
 for each_part in parts:
     result = result.union(each_part)
 
+'''
 for each_oh in over_hang1:
     result = result.union(each_oh.translate((0, 0, screw_post_cut_len - 0.16))) 
 for each_oh in over_hang2:
     result = result.union(each_oh.translate((0, 0, screw_post_cut_len))) 
-
+'''
 
 # Let's cut a small piece and print it
 
